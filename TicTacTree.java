@@ -40,6 +40,8 @@ public class TicTacTree {
 		combos = new int[8];
 		x = (move - 1)%3;
 		y = (move - 1)/3;
+		System.err.println(x);
+		System.err.println(y);
 		//Check for winning combinations
 		combos[x] += board[x][y];
 		combos[y + 3] += board[x][y];

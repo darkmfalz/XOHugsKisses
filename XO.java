@@ -30,10 +30,13 @@ public class XO {
 		
 		if(xo)
 			current = new TicTacTree();
-		else
+		else{
+			
 			current = new TicTacTree(scanner.nextInt());
+			printBoard(current);
+			
+		}
 		populateTree(current);
-		printTree();
 		playGame();
 		
 	}
