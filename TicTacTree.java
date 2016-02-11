@@ -36,13 +36,21 @@ public class TicTacTree {
 	public TicTacTree(int move){
 		
 		board = new int[3][3];
+		board[x][y] = -1;
 		combos = new int[8];
+		x = (move - 1)%3;
+		y = (move - 1)/3;
+		//Check for winning combinations
+		combos[x] += board[x][y];
+		combos[y + 3] += board[x][y];
+		if(x == y)
+			combos[6] += board[x][y];
+		if(x == 2 - y)
+			combos[7] += board[x][y];
+		
 		isMyMove = false;
 		goalState = false;
 		winner = 0;
-		x = (move - 1)%3;
-		y = (move - 1)/3;
-		board[x][y] = -1;
 		parent = null;
 		leftChild = null;
 		rightSibling = null;

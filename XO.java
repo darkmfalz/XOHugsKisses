@@ -15,7 +15,7 @@ public class XO {
 	//true if I am x, false if I am o
 	boolean xo;
 	
-	public XO(){
+	public XO() throws FileNotFoundException, UnsupportedEncodingException{
 		
 		System.err.println("Will you play X or O?");
 		String input = scanner.next();
@@ -33,6 +33,7 @@ public class XO {
 		else
 			current = new TicTacTree(scanner.nextInt());
 		populateTree(current);
+		printTree();
 		playGame();
 		
 	}
@@ -182,7 +183,7 @@ public class XO {
 			
 			TicTacTree thisun = queue.poll();
 			
-			writer.println(thisun.getWinner() + " " + thisun.depth + " " + thisun.isMyMove());
+			writer.println(thisun.getWinner() + " " + thisun.depth + " " + thisun.isMyMove() + " " + thisun.isGoalState());
 			for(int i = 0; i < 3; i++){
 				writer.print("[ ");
 				for(int j = 0; j < 3; j++)
