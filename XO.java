@@ -22,4 +22,10 @@ public class XO {
 		
 	}
 	
+	public void minimaxConstruct(){
+		
+		
+		
+	}
+	
 }
