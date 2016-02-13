@@ -23,7 +23,7 @@ public class TicTacTree {
 		combos = new int[8];
 		isMyMove = false;
 		goalState = false;
-		winner = 0;
+		winner = 1;
 		x = -1;
 		y = -1;
 		parent = null;
@@ -35,13 +35,12 @@ public class TicTacTree {
 	
 	public TicTacTree(int move){
 		
+		//This is always after the opponent's first move
 		board = new int[3][3];
-		board[x][y] = -1;
-		combos = new int[8];
 		x = (move - 1)%3;
 		y = (move - 1)/3;
-		System.err.println(x);
-		System.err.println(y);
+		board[x][y] = -1;
+		combos = new int[8];
 		//Check for winning combinations
 		combos[x] += board[x][y];
 		combos[y + 3] += board[x][y];
@@ -52,7 +51,7 @@ public class TicTacTree {
 		
 		isMyMove = false;
 		goalState = false;
-		winner = 0;
+		winner = 1;
 		parent = null;
 		leftChild = null;
 		rightSibling = null;
@@ -61,13 +60,19 @@ public class TicTacTree {
 	}
 	
 	public TicTacTree(TicTacTree parent, int[][] oldBoard, int[] oldCombos, int move, boolean isMyMove){
+		
+		//Tree-specific somethings
 		depth = parent.depth + 1;
 		this.parent = parent;
 		leftChild = null;
 		rightSibling = null;
 		
+		//Game-specific somethings
 		goalState = false;
-		winner = 0;
+		if(isMyMove)
+			winner = -1;
+		else
+			winner = 1;
 		this.isMyMove = isMyMove;
 		x = (move - 1)%3;
 		y = (move - 1)/3;
@@ -138,13 +143,19 @@ public class TicTacTree {
 	}
 	
 	public TicTacTree(TicTacTree parent, int[][] oldBoard, int[] oldCombos, int x, int y, boolean isMyMove){
+		
+		//Tree-specific somethings
 		depth = parent.depth + 1;
 		this.parent = parent;
 		leftChild = null;
 		rightSibling = null;
 		
+		//Game-specific somethings
 		goalState = false;
-		winner = 0;
+		if(isMyMove)
+			winner = -1;
+		else
+			winner = 1;
 		this.isMyMove = isMyMove;
 		this.x = x;
 		this.y = y;
