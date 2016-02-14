@@ -16,6 +16,9 @@ public class NineTicTacTree {
 		x = -1;
 		y = -1;
 		combos = new int[9][8];
+		fullBoard = new boolean[9];
+		for(int i = 0; i < fullBoard.length; i++)
+			fullBoard[i] = false;
 		isMyMove = true;
 		goalState = false;
 		score = 1;
@@ -33,17 +36,23 @@ public class NineTicTacTree {
 		board = new int[9][9];
 		int x1 = (move1 - 1)%3;
 		int y1 = (move1 - 1)/3;
-		x = x1*9 + (move2 - 1)%3;
-		y = y1*9 + (move2 - 1)/3;
+		x = x1*3 + (move2 - 1)%3;
+		y = y1*3 + (move2 - 1)/3;
 		board[x][y] = -1;
 		combos = new int[9][8];
 		//Update combination history
-		combos[move1 - 1][x] += board[x][y];
-		combos[move1 - 1][y + 3] += board[x][y];
+		x1 *= 3;
+		y1 *= 3;
+		combos[move1 - 1][x - x1] += board[x][y];
+		combos[move1 - 1][y - y1 + 3] += board[x][y];
 		if(x == y)
 			combos[move1 - 1][6] += board[x][y];
 		if(x == 2 - y)
 			combos[move1 - 1][7] += board[x][y];
+		
+		fullBoard = new boolean[9];
+		for(int i = 0; i < fullBoard.length; i++)
+			fullBoard[i] = false;
 		
 		isMyMove = true;
 		goalState = false;
@@ -85,10 +94,10 @@ public class NineTicTacTree {
 			int singleFullBoard = 1;
 			for(int j = 0; j < 9; j++){
 				
-				int x1 = (i - 1)%3;
-				int y1 = (i - 1)/3;
-				int x2 = x1*9 + (j - 1)%3;
-				int y2 = y1*9 + (j - 1)/3;
+				int x1 = (i)%3;
+				int y1 = (i)/3;
+				int x2 = x1*3 + (j)%3;
+				int y2 = y1*3 + (j)/3;
 				
 				if(x2 != x || y2 != y)
 					board[x2][y2] = oldBoard[x2][y2];
@@ -120,23 +129,26 @@ public class NineTicTacTree {
 			for(int j = 0; j < combos[i].length; j++)
 				combos[i][j] = oldCombos[i][j];
 		
-		combos[getMove1() - 1][x] += board[x][y];
-		if(Math.abs(combos[getMove1() - 1][x]) >= 3){
+		int x1 = (getMove1() - 1)%3 * 3;
+		int y1 = (getMove1() - 1)/3 * 3;
+		
+		combos[getMove1() - 1][x - x1] += board[x][y];
+		if(Math.abs(combos[getMove1() - 1][x - x1]) >= 3){
 			
 			hasCombo = true;
 			goalState = true;
-			score = Math.abs(combos[getMove1() - 1][x])/combos[getMove1() - 1][x];
+			score = Math.abs(combos[getMove1() - 1][x - x1])/combos[getMove1() - 1][x - x1];
 			
 		}
-		combos[getMove1() - 1][y + 3] += board[x][y];
-		if(Math.abs(combos[getMove1() - 1][y + 3]) >= 3){
+		combos[getMove1() - 1][y - y1 + 3] += board[x][y];
+		if(Math.abs(combos[getMove1() - 1][y - y1 + 3]) >= 3){
 			
 			hasCombo = true;
 			goalState = true;
-			score = Math.abs(combos[getMove1() - 1][y + 3])/combos[getMove1() - 1][y + 3];
+			score = Math.abs(combos[getMove1() - 1][y - y1 + 3])/combos[getMove1() - 1][y - y1 + 3];
 			
 		}
-		if(x == y){
+		if(x - x1 == y - y1){
 			
 			combos[getMove1() - 1][6] += board[x][y];
 			if(Math.abs(combos[getMove1() - 1][6]) >= 3){
@@ -148,7 +160,7 @@ public class NineTicTacTree {
 			}
 			
 		}
-		if(x == 2 - y){
+		if(x - x1 == 2 - (y - y1)){
 			
 			combos[getMove1() - 1][7] += board[x][y];
 			if(Math.abs(combos[getMove1() - 1][7]) >= 3){
@@ -201,7 +213,7 @@ public class NineTicTacTree {
 	
 	public boolean isNotFull(int board){
 		
-		return fullBoard[board - 1];
+		return !fullBoard[board - 1];
 		
 	}
 	
@@ -227,8 +239,8 @@ public class NineTicTacTree {
 		
 		int x1 = (move1 - 1)%3;
 		int y1 = (move1 - 1)/3;
-		int x2 = x1*9 + (move2 - 1)%3;
-		int y2 = y1*9 + (move2 - 1)/3;
+		int x2 = x1*3 + (move2 - 1)%3;
+		int y2 = y1*3 + (move2 - 1)/3;
 		
 		return (x2 == x && y2 == y);
 		

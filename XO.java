@@ -31,6 +31,7 @@ public class XO {
 			current = new TicTacTree();
 		else{
 			
+			System.err.println("Input first move");
 			current = new TicTacTree(scanner.nextInt());
 			printBoard(current);
 			
@@ -198,6 +199,7 @@ public class XO {
 			current = new TicTacTree();
 		else{
 			
+			System.err.println("Input first move");
 			current = new TicTacTree(scanner.nextInt());
 			printBoard(current);
 			
@@ -397,6 +399,7 @@ public class XO {
 			current = new TicTacTree();
 		else{
 			
+			System.err.println("Input first move");
 			current = new TicTacTree(scanner.nextInt());
 			printBoard(current);
 			

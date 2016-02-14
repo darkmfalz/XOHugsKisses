@@ -11,51 +11,100 @@ public class XOHugsKisses {
 	
 	public XOHugsKisses(){
 		
-		System.err.println("Will you play X or O?");
-		String input = scanner.next();
-		input = input.toLowerCase();
-		
-		if(input.equals("o"))
-			xo = true;
-		else if(input.equals("x"))
-			xo = false;
-		else
-			System.err.println("You're a dumbass.");	
+		resetGameMinimaxAB();
 		
 	}
 	
-
-	private double minimaxAB(NineTicTacTree current2, double alpha, double beta){
+	private double minimaxAB(NineTicTacTree current, double alpha, double beta){
 		
-		if(current2.isGoalState())
-			return current2.getScore();
+		if(current.isGoalState())
+			return current.getScore();
 		
-		if(current2.isMyMove()){
+		if(current.isMyMove()){
 			
 			double v = Double.NEGATIVE_INFINITY;
 			NineTicTacTree currentChild = null;
 			
-			top:
-			for(int i = 0; i < 3; i++)
-				for(int j = 0; j < 3; j++)
-					if(current2.isBlank(i, j)){
-						
-						NineTicTacTree child = current2.makeChild(i, j);
-						if(current2.getLeftChild() == null)
-							current2.setLeftChild(child);
-						else
-							currentChild.setRightSibling(child);
-						currentChild = child;
-						
-						v = Math.max(v, minimaxAB(currentChild, alpha, beta));
-						alpha = Math.max(alpha, v);
-						
-						if(beta <= alpha)
-							break top;
-						
-					}
+			if(current.noMove()){
+				
+				top:
+				for(int i = 0; i < 9; i++)
+					for(int j = 0; j < 9; j++)
+						if(current.isBlank(i, j)){
+							
+							NineTicTacTree child = current.makeChild(i, j);
+							if(current.getLeftChild() == null)
+								current.setLeftChild(child);
+							else
+								currentChild.setRightSibling(child);
+							currentChild = child;
+							
+							v = Math.max(v, minimaxAB(currentChild, alpha, beta));
+							alpha = Math.max(alpha, v);
+							
+							if(beta <= alpha)
+								break top;
+							
+						}
+				
+			}
+			else{
+				
+				int move1 = current.getMove2();
+				
+				if(current.isNotFull(move1)){
+					
+					int x1 = (move1 - 1)%3 * 3;
+					int y1 = (move1 - 1)/3 * 3;
+					
+					top:
+					for(int i = x1; i < 3 + x1; i++)
+						for(int j = y1; j < 3 + y1; j++)
+							if(current.isBlank(i, j)){
+								
+								NineTicTacTree child = current.makeChild(i, j);
+								if(current.getLeftChild() == null)
+									current.setLeftChild(child);
+								else
+									currentChild.setRightSibling(child);
+								currentChild = child;
+								
+								v = Math.max(v, minimaxAB(currentChild, alpha, beta));
+								alpha = Math.max(alpha, v);
+								
+								if(beta <= alpha)
+									break top;
+								
+							}
+					
+				}
+				else{
+					
+					top:
+					for(int i = 0; i < 9; i++)
+						for(int j = 0; j < 9; j++)
+							if(current.isBlank(i, j)){
+								
+								NineTicTacTree child = current.makeChild(i, j);
+								if(current.getLeftChild() == null)
+									current.setLeftChild(child);
+								else
+									currentChild.setRightSibling(child);
+								currentChild = child;
+								
+								v = Math.max(v, minimaxAB(currentChild, alpha, beta));
+								alpha = Math.max(alpha, v);
+								
+								if(beta <= alpha)
+									break top;
+								
+							}
+					
+				}
+				
+			}
 			
-			current2.setScore(v);
+			current.setScore(v);
 			return v;
 			
 		}
@@ -64,27 +113,86 @@ public class XOHugsKisses {
 			double v = Double.POSITIVE_INFINITY;
 			NineTicTacTree currentChild = null;
 			
-			top:
-			for(int i = 0; i < 3; i++)
-				for(int j = 0; j < 3; j++)
-					if(current2.isBlank(i, j)){
-						
-						NineTicTacTree child = current2.makeChild(i, j);
-						if(current2.getLeftChild() == null)
-							current2.setLeftChild(child);
-						else
-							currentChild.setRightSibling(child);
-						currentChild = child;
-						
-						v = Math.min(v, minimaxAB(currentChild, alpha, beta));
-						beta = Math.min(beta, v);
-						
-						if(beta <= alpha)
-							break top;
-						
-					}
+			if(current.noMove()){
+				
+				top:
+				for(int i = 0; i < 9; i++)
+					for(int j = 0; j < 9; j++)
+						if(current.isBlank(i, j)){
+							
+							NineTicTacTree child = current.makeChild(i, j);
+							if(current.getLeftChild() == null)
+								current.setLeftChild(child);
+							else
+								currentChild.setRightSibling(child);
+							currentChild = child;
+							
+							v = Math.min(v, minimaxAB(currentChild, alpha, beta));
+							beta = Math.min(beta, v);
+							
+							if(beta <= alpha)
+								break top;
+							
+						}
+				
+			}
+			else{
+				
+				int move1 = current.getMove2();
+				
+				if(current.isNotFull(move1)){
+					
+					int x1 = (move1 - 1)%3 * 3;
+					int y1 = (move1 - 1)/3 * 3;
+					
+					top:
+					for(int i = x1; i < 3 + x1; i++)
+						for(int j = y1; j < 3 + y1; j++)
+							if(current.isBlank(i, j)){
+								
+								NineTicTacTree child = current.makeChild(i, j);
+								if(current.getLeftChild() == null)
+									current.setLeftChild(child);
+								else
+									currentChild.setRightSibling(child);
+								currentChild = child;
+								
+								v = Math.min(v, minimaxAB(currentChild, alpha, beta));
+								beta = Math.min(beta, v);
+								
+								if(beta <= alpha)
+									break top;
+								
+							}
+					
+				}
+				else{
+					
+					top:
+					for(int i = 0; i < 9; i++)
+						for(int j = 0; j < 9; j++)
+							if(current.isBlank(i, j)){
+								
+								NineTicTacTree child = current.makeChild(i, j);
+								if(current.getLeftChild() == null)
+									current.setLeftChild(child);
+								else
+									currentChild.setRightSibling(child);
+								currentChild = child;
+								
+								v = Math.min(v, minimaxAB(currentChild, alpha, beta));
+								beta = Math.min(beta, v);
+								
+								if(beta <= alpha)
+									break top;
+								
+							}
+					
+				}
+				
+			}
 			
-			current2.setScore(v);
+			current.setScore(v);
 			return v;
 			
 		}
@@ -200,7 +308,7 @@ public class XOHugsKisses {
 	private void resetGameMinimaxAB(){
 		
 		System.err.println("Will you play X or O?");
-		String input = scanner.next();
+		String input = scanner.nextLine();
 		input = input.toLowerCase();
 		
 		if(input.equals("o"))
@@ -218,15 +326,16 @@ public class XOHugsKisses {
 			current = new NineTicTacTree();
 		else{
 			
-			String string = scanner.next();
-			String[] split = string.split("\\s+");
+			System.err.println("Input first move");
+			String string = scanner.nextLine();
+			String[] split = string.split(" ");
 			current = new NineTicTacTree(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
 			printBoard(current);
 			
 		}
 		
 		minimaxAB(current, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-		playGameMinimaxAB();
+		//playGameMinimaxAB();
 		
 	}
 	
@@ -249,12 +358,12 @@ public class XOHugsKisses {
 				else
 					System.err.print("  ");
 				
-				if(j + 1 % 3 == 0 && j != 8)
+				if((j + 1) % 3 == 0 && j != 8)
 					System.err.print("| ");
 			}
 			System.err.println("]");
-			if(i + 1 % 3 == 0 && i != 8){
-				System.err.println("  ");
+			if((i + 1) % 3 == 0 && i != 8){
+				System.err.print(" -");
 				for(int j = 0; j < 10; j++)
 					System.err.print("--");
 				System.err.println("--");
