@@ -1,20 +1,16 @@
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class XO {
 
+public class XO {
 
 	private TicTacTree current;
 	Scanner scanner = new Scanner(System.in);
 	//true if I am x, false if I am o
 	boolean xo;
 	
-	public XO() throws FileNotFoundException, UnsupportedEncodingException{
+	public XO(){
 		
 		System.err.println("Will you play X or O?");
 		String input = scanner.next();
@@ -39,118 +35,20 @@ public class XO {
 			printBoard(current);
 			
 		}
-		populateTreeAB(current, Integer.MIN_VALUE, Integer.MAX_VALUE);
-		playGameAB();
-		//populateTree(current);
-		//playGame();
+		
+		minimax(current);
+		playGameMinimax();
 		
 	}
 	
-	private void playGame(){
+	private double minimax(TicTacTree current){
 		
-		while(!current.isGoalState()){
+		if(current.isGoalState())
+			return current.getScore();
 		
-			TicTacTree currentChild = current.getLeftChild();
-			TicTacTree bestChild = current.getLeftChild();
-			int score = bestChild.getWinner();
+		if(current.isMyMove()){
 			
-			while(currentChild != null){
-				
-				if(currentChild.getWinner() > score){
-					
-					bestChild = currentChild;
-					score = bestChild.getWinner();
-					
-				}
-				currentChild = currentChild.getRightSibling();
-				
-			}
-			ArrayList<TicTacTree> bestChildren = new ArrayList<TicTacTree>();
-			currentChild = current.getLeftChild();
-			while(currentChild != null){
-				
-				if(currentChild.getWinner() == score)
-					bestChildren.add(currentChild);
-				currentChild = currentChild.getRightSibling();
-				
-			}
-			
-			Random random = new Random();
-			current = bestChildren.get(random.nextInt(bestChildren.size()));
-			printBoard(current);
-			System.out.println(current.getMove());
-			
-			if(current.isGoalState())
-				break;
-			
-			boolean goodMove = false;
-			
-			while(!goodMove){
-				
-				int move = scanner.nextInt();
-				currentChild = current.getLeftChild();
-				
-				while(currentChild != null){
-					
-					if(currentChild.getMove() == move){
-						
-						current = currentChild;
-						goodMove = true;
-						break;
-						
-					}
-					currentChild = currentChild.getRightSibling();
-				}
-				
-				if(!goodMove)
-					System.err.println("Invalid move");
-				
-			}
-			
-			printBoard(current);
-			
-		}
-		
-		resetGame();
-		
-	}
-	
-	private void resetGame(){
-		
-		System.err.println("Will you play X or O?");
-		String input = scanner.next();
-		input = input.toLowerCase();
-		
-		if(input.equals("o"))
-			xo = true;
-		else if(input.equals("x"))
-			xo = false;
-		else{
-		
-			System.err.println("You're a dumbass.");
-			return;
-		
-		}
-			
-		if(xo)
-			current = new TicTacTree();
-		else{
-			
-			current = new TicTacTree(scanner.nextInt());
-			printBoard(current);
-			
-		}
-		//populateTreeAB(current, Integer.MIN_VALUE, Integer.MAX_VALUE);
-		//playGameAB();
-		populateTree(current);
-		playGame();
-	
-	}
-	
-	private void populateTree(TicTacTree current){
-
-		if(!current.isGoalState()){
-			
+			double v = Double.NEGATIVE_INFINITY;
 			TicTacTree currentChild = null;
 			
 			for(int i = 0; i < 3; i++)
@@ -158,79 +56,99 @@ public class XO {
 					if(current.isBlank(i, j)){
 						
 						TicTacTree child = current.makeChild(i, j);
-						if(current.getLeftChild() == null){
-							
+						if(current.getLeftChild() == null)
 							current.setLeftChild(child);
-							populateTree(child);
-							current.setWinner(child.getWinner());
-							currentChild = child;
-							
-						}
-						else{
-							
-							currentChild.setRightSibling(child);
-							populateTree(child);
-							currentChild = child;
-							
-						}
-						
-						if(!current.isMyMove())
-							current.setWinner(Math.max(current.getWinner(), child.getWinner()));
 						else
-							current.setWinner(Math.min(current.getWinner(), child.getWinner()));
+							currentChild.setRightSibling(child);
+						currentChild = child;
+						
+						v = Math.max(v, minimax(currentChild));
+							
+					}
+			
+			current.setScore(v);
+			return v;
+			
+		}
+		else{
+			
+			double v = Double.POSITIVE_INFINITY;
+			TicTacTree currentChild = null;
+			
+			for(int i = 0; i < 3; i++)
+				for(int j = 0; j < 3; j++)
+					if(current.isBlank(i, j)){
+						
+						TicTacTree child = current.makeChild(i, j);
+						if(current.getLeftChild() == null)
+							current.setLeftChild(child);
+						else
+							currentChild.setRightSibling(child);
+						currentChild = child;
+						
+						v = Math.min(v, minimax(currentChild));
 						
 					}
+			
+			current.setScore(v);
+			return v;
 			
 		}
 		
 	}
-	
-	private void playGameAB(){
+
+	private void playGameMinimax(){
 		
+		//While the goal state hasn't been reached
 		while(!current.isGoalState()){
 		
+			//Find the best moves from the current board
 			TicTacTree currentChild = current.getLeftChild();
 			TicTacTree bestChild = current.getLeftChild();
-			int score = bestChild.getWinner();
+			double score = bestChild.getScore();
 			
+			//First, find the best score among the possible moves
 			while(currentChild != null){
 				
-				if(currentChild.getWinner() > score){
+				if(currentChild.getScore() > score){
 					
 					bestChild = currentChild;
-					score = bestChild.getWinner();
+					score = bestChild.getScore();
 					
 				}
 				currentChild = currentChild.getRightSibling();
 				
 			}
+			//Now create a list of the moves that have the same score as the best score
 			ArrayList<TicTacTree> bestChildren = new ArrayList<TicTacTree>();
 			currentChild = current.getLeftChild();
 			while(currentChild != null){
 				
-				if(currentChild.getWinner() == score)
+				if(currentChild.getScore() == score)
 					bestChildren.add(currentChild);
 				currentChild = currentChild.getRightSibling();
 				
 			}
 			
+			//Select a move with the same score as the best move randomly
 			Random random = new Random();
 			current = bestChildren.get(random.nextInt(bestChildren.size()));
 			printBoard(current);
 			System.out.println(current.getMove());
-			System.err.println(current.getWinner());
 			
 			if(current.isGoalState())
 				break;
 			
+			//Now, receive the other player's moves
 			boolean goodMove = false;
 			
+			//While the other player doesn't input a valid move
 			while(!goodMove){
 				
 				int move = scanner.nextInt();
-				System.err.println(current.getWinner());
 				currentChild = current.getLeftChild();
 				
+				//Check to see if there is a valid move that is the same as the one inputted by the user
 				while(currentChild != null){
 					
 					if(currentChild.getMove() == move){
@@ -243,29 +161,6 @@ public class XO {
 					currentChild = currentChild.getRightSibling();
 				}
 				
-				if(!goodMove){
-					
-					current.setLeftChild(null);
-					
-					top:
-					for(int i = 0; i < 3; i++)
-						for(int j = 0; j < 3; j++)
-							if(current.isBlank(i, j)){
-								
-								TicTacTree child = current.makeChild(i, j);
-								if(child.getMove() == move){
-									
-									current = child;
-									goodMove = true;
-									populateTreeAB(current, Integer.MIN_VALUE, Integer.MAX_VALUE);
-									break top;
-									
-								}
-								
-							}
-					
-				}
-				
 				if(!goodMove)
 					System.err.println("Invalid move");
 				
@@ -275,77 +170,39 @@ public class XO {
 			
 		}
 		
+		//Automatically reset the game once it's over
+		resetGameMinimax();
+		
 	}
 	
-	private int populateTreeAB(TicTacTree current, int alpha, int beta){
+	private void resetGameMinimax(){
 		
-		if(current.isGoalState())
-			return current.getWinner();
+		System.err.println("Will you play X or O?");
+		String input = scanner.next();
+		input = input.toLowerCase();
 		
-		if(current.isMyMove()){
-			
-			TicTacTree currentChild = current.getLeftChild();
-			int v = Integer.MIN_VALUE;
-			
-			for(int i = 0; i < 3; i++)
-				for(int j = 0; j < 3; j++){
-					
-					if(current.isBlank(i, j)){
-						
-						TicTacTree child = current.makeChild(i, j);
-						
-						v = Math.max(v, populateTreeAB(child, alpha, beta));
-						if(current.getLeftChild() == null){
-							current.setLeftChild(child);
-							current.setWinner(child.getWinner());
-						}
-						else
-							currentChild.setRightSibling(child);
-						currentChild = child;
-						alpha = Math.max(alpha, v);
-						current.setWinner(Math.min(current.getWinner(), currentChild.getWinner()));
-						if(beta <= alpha)
-							return v;
-						
-					}
-					
-				}
-			
-			return v;
-			
-		}
+		if(input.equals("o"))
+			xo = true;
+		else if(input.equals("x"))
+			xo = false;
 		else{
 			
-			TicTacTree currentChild = current.getLeftChild();
-			int v = Integer.MAX_VALUE;
+			System.err.println("You're a dumbass.");
+			return;
+		
+		}
 			
-			for(int i = 0; i < 3; i++)
-				for(int j = 0; j < 3; j++){
-					
-					if(current.isBlank(i, j)){
-						
-						TicTacTree child = current.makeChild(i, j);
-						
-						v = Math.min(v, populateTreeAB(child, alpha, beta));
-						if(current.getLeftChild() == null){
-							current.setLeftChild(child);
-							current.setWinner(child.getWinner());
-						}
-						else
-							currentChild.setRightSibling(child);
-						currentChild = child;
-						beta = Math.min(beta, v);
-						current.setWinner(Math.max(current.getWinner(), child.getWinner()));
-						if(beta <= alpha)
-							return v;
-						
-					}
-					
-				}
+		if(xo)
+			current = new TicTacTree();
+		else{
 			
-			return v;
+			current = new TicTacTree(scanner.nextInt());
+			printBoard(current);
 			
 		}
+		
+		minimax(current);
+		playGameMinimax();
 		
 	}
 	
@@ -369,52 +226,6 @@ public class XO {
 			System.err.println("]");
 		}
 		System.err.println();
-		
-	}
-	
-	private void printTree() throws FileNotFoundException, UnsupportedEncodingException{
-		
-		PrintWriter writer = new PrintWriter("testdata.txt", "UTF-8");
-		
-		LinkedList<TicTacTree> queue = new LinkedList<TicTacTree>();
-		queue.add(current);
-		
-		while(!queue.isEmpty()){
-			
-			TicTacTree thisun = queue.poll();
-			
-			writer.println(thisun.getWinner() + " " + thisun.depth + " " + thisun.isMyMove() + " " + thisun.isGoalState());
-			for(int i = 0; i < 3; i++){
-				writer.print("[ ");
-				for(int j = 0; j < 3; j++)
-					if(thisun.getBoard()[j][i] == 1)
-						if(xo)
-							writer.print("X ");
-						else
-							writer.print("O ");
-					else if(thisun.getBoard()[j][i] == -1)
-						if(xo)
-							writer.print("O ");
-						else
-							writer.print("X ");
-					else
-						writer.print("  ");
-				writer.println("]");
-			}
-			writer.println();
-			
-			TicTacTree currentChild = thisun.getLeftChild();
-			
-			while(currentChild != null){
-				
-				queue.add(currentChild);
-				currentChild = currentChild.getRightSibling();
-				
-			}
-			
-		}
-		
-		writer.close();
 		
 	}
 	
