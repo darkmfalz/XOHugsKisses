@@ -297,6 +297,20 @@ public class NineTicTacTree {
 	
 	public double heuristicFunction(){
 		
+		heuristic = 0;
+		
+		for(int i = 0; i < combos.length; i++)
+			for(int j = 0; j < combos[i].length; j++){
+				
+				if(Math.abs(combos[i][j]) == 1)
+					heuristic += combos[i][j];
+				else if(Math.abs(combos[i][j]) == 2)
+					heuristic += combos[i][j]*10;
+				else if(Math.abs(combos[i][j]) == 3)
+					heuristic += combos[i][j]*100;
+					
+			}
+		
 		return heuristic;
 		
 	}

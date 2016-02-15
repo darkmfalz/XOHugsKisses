@@ -2,16 +2,16 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class XOHugsKisses {
+public class XONoughtCross {
 
 	private NineTicTacTree current;
 	Scanner scanner = new Scanner(System.in);
 	//true if I am x, false if I am o
 	boolean xo;
 	
-	public XOHugsKisses(){
+	public XONoughtCross(){
 		
-		resetGameMinimaxAB();
+		resetGameMinimaxABHeuristic();
 		
 	}
 	
@@ -307,13 +307,13 @@ public class XOHugsKisses {
 	
 	private void resetGameMinimaxAB(){
 		
-		System.err.println("Will you play X or O?");
+		System.err.println("Will I play X or O?");
 		String input = scanner.nextLine();
 		input = input.toLowerCase();
 		
-		if(input.equals("o"))
+		if(input.equals("x"))
 			xo = true;
-		else if(input.equals("x"))
+		else if(input.equals("o"))
 			xo = false;
 		else{
 			
@@ -335,6 +335,225 @@ public class XOHugsKisses {
 		}
 		
 		minimaxAB(current, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+		//playGameMinimaxAB();
+		
+	}
+	
+	private double minimaxABHeuristic(NineTicTacTree current, double alpha, double beta, int depth){
+		
+		if(current.isGoalState() || depth == 0)
+			return current.heuristicFunction();
+		
+		if(current.isMyMove()){
+			
+			double v = Double.NEGATIVE_INFINITY;
+			NineTicTacTree currentChild = null;
+			
+			if(current.noMove()){
+				
+				top:
+				for(int i = 0; i < 9; i++)
+					for(int j = 0; j < 9; j++)
+						if(current.isBlank(i, j)){
+							
+							NineTicTacTree child = current.makeChild(i, j);
+							if(current.getLeftChild() == null)
+								current.setLeftChild(child);
+							else
+								currentChild.setRightSibling(child);
+							currentChild = child;
+							
+							v = Math.max(v, minimaxABHeuristic(currentChild, alpha, beta, depth - 1));
+							alpha = Math.max(alpha, v);
+							
+							if(beta <= alpha)
+								break top;
+							
+						}
+				
+			}
+			else{
+				
+				int move1 = current.getMove2();
+				
+				if(current.isNotFull(move1)){
+					
+					int x1 = (move1 - 1)%3 * 3;
+					int y1 = (move1 - 1)/3 * 3;
+					
+					top:
+					for(int i = x1; i < 3 + x1; i++)
+						for(int j = y1; j < 3 + y1; j++)
+							if(current.isBlank(i, j)){
+								
+								NineTicTacTree child = current.makeChild(i, j);
+								if(current.getLeftChild() == null)
+									current.setLeftChild(child);
+								else
+									currentChild.setRightSibling(child);
+								currentChild = child;
+								
+								v = Math.max(v, minimaxABHeuristic(currentChild, alpha, beta, depth - 1));
+								alpha = Math.max(alpha, v);
+								
+								if(beta <= alpha)
+									break top;
+								
+							}
+					
+				}
+				else{
+					
+					top:
+					for(int i = 0; i < 9; i++)
+						for(int j = 0; j < 9; j++)
+							if(current.isBlank(i, j)){
+								
+								NineTicTacTree child = current.makeChild(i, j);
+								if(current.getLeftChild() == null)
+									current.setLeftChild(child);
+								else
+									currentChild.setRightSibling(child);
+								currentChild = child;
+								
+								v = Math.max(v, minimaxABHeuristic(currentChild, alpha, beta, depth - 1));
+								alpha = Math.max(alpha, v);
+								
+								if(beta <= alpha)
+									break top;
+								
+							}
+					
+				}
+				
+			}
+			
+			current.setHeuristic(v);
+			return v;
+			
+		}
+		else{
+			
+			double v = Double.POSITIVE_INFINITY;
+			NineTicTacTree currentChild = null;
+			
+			if(current.noMove()){
+				
+				top:
+				for(int i = 0; i < 9; i++)
+					for(int j = 0; j < 9; j++)
+						if(current.isBlank(i, j)){
+							
+							NineTicTacTree child = current.makeChild(i, j);
+							if(current.getLeftChild() == null)
+								current.setLeftChild(child);
+							else
+								currentChild.setRightSibling(child);
+							currentChild = child;
+							
+							v = Math.min(v, minimaxABHeuristic(currentChild, alpha, beta, depth - 1));
+							beta = Math.min(beta, v);
+							
+							if(beta <= alpha)
+								break top;
+							
+						}
+				
+			}
+			else{
+				
+				int move1 = current.getMove2();
+				
+				if(current.isNotFull(move1)){
+					
+					int x1 = (move1 - 1)%3 * 3;
+					int y1 = (move1 - 1)/3 * 3;
+					
+					top:
+					for(int i = x1; i < 3 + x1; i++)
+						for(int j = y1; j < 3 + y1; j++)
+							if(current.isBlank(i, j)){
+								
+								NineTicTacTree child = current.makeChild(i, j);
+								if(current.getLeftChild() == null)
+									current.setLeftChild(child);
+								else
+									currentChild.setRightSibling(child);
+								currentChild = child;
+								
+								v = Math.min(v, minimaxABHeuristic(currentChild, alpha, beta, depth - 1));
+								beta = Math.min(beta, v);
+								
+								if(beta <= alpha)
+									break top;
+								
+							}
+					
+				}
+				else{
+					
+					top:
+					for(int i = 0; i < 9; i++)
+						for(int j = 0; j < 9; j++)
+							if(current.isBlank(i, j)){
+								
+								NineTicTacTree child = current.makeChild(i, j);
+								if(current.getLeftChild() == null)
+									current.setLeftChild(child);
+								else
+									currentChild.setRightSibling(child);
+								currentChild = child;
+								
+								v = Math.min(v, minimaxABHeuristic(currentChild, alpha, beta, depth - 1));
+								beta = Math.min(beta, v);
+								
+								if(beta <= alpha)
+									break top;
+								
+							}
+					
+				}
+				
+			}
+			
+			current.setHeuristic(v);
+			return v;
+			
+		}
+		
+	}
+
+	private void resetGameMinimaxABHeuristic(){
+		
+		System.err.println("Will I play X or O?");
+		String input = scanner.nextLine();
+		input = input.toLowerCase();
+		
+		if(input.equals("x"))
+			xo = true;
+		else if(input.equals("o"))
+			xo = false;
+		else{
+			
+			System.err.println("You're a dumbass.");
+			return;
+		
+		}
+			
+		if(xo)
+			current = new NineTicTacTree();
+		else{
+			
+			System.err.println("Input first move");
+			String string = scanner.nextLine();
+			String[] split = string.split(" ");
+			current = new NineTicTacTree(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+			printBoard(current);
+			
+		}
+		
+		//Depth of 7 before I run out of heap space
+		minimaxABHeuristic(current, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 7);
 		//playGameMinimaxAB();
 		
 	}
